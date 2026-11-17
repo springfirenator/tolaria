@@ -134,7 +134,7 @@ describe("App", () => {
 	});
 
 	it(
-		"opens a note window after loading the active vault graph",
+		"opens a note window read-only after loading the active vault graph",
 		async () => {
 			const listVault = vi.fn(() => mockEntries);
 			const reloadVaultEntry = vi.fn(
@@ -177,7 +177,7 @@ describe("App", () => {
 					{},
 					{ timeout: SLOW_APP_READY_TIMEOUT_MS },
 				),
-			).toHaveAttribute("data-editable", "true");
+			).toHaveAttribute("data-editable", "false");
 			expect(listVault).toHaveBeenCalled();
 		},
 		SLOW_APP_READY_TIMEOUT_MS * 2,

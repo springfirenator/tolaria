@@ -4,6 +4,7 @@ import { formatShortcutDisplay } from '../hooks/appCommandCatalog'
 import { RUNTIME_STYLE_NONCE } from '../lib/runtimeStyleNonce'
 import type { VaultEntry } from '../types'
 import { bindVaultConfigStore, resetVaultConfigStore } from '../utils/vaultConfigStore'
+import { setNoteEditable } from '../hooks/useNoteEditMode'
 import {
   EditorTestHarness as Editor,
   blockNoteCreation,
@@ -360,6 +361,7 @@ describe('Editor', () => {
   })
 
   it('keeps the rich editor out of spellcheck without disabling IME autocorrection', () => {
+    setNoteEditable(mockEntry.path, true)
     renderEditor({
       tabs: [mockTab],
       activeTabPath: mockEntry.path,
@@ -716,8 +718,37 @@ describe('Editor', () => {
 
 })
 
+describe('note edit mode', () => {
+  beforeEach(() => {
+    resetEditorTestState()
+  })
+
+  it('opens a note read-only and toggles it into and out of edit mode from the toolbar', () => {
+    renderEditor({ tabs: [mockTab], activeTabPath: mockEntry.path })
+
+    const editable = () => screen.getByTestId('blocknote-editable')
+    expect(editable()).toHaveAttribute('contenteditable', 'false')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Switch to edit mode' }))
+    expect(editable()).toHaveAttribute('contenteditable', 'true')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Switch to view mode' }))
+    expect(editable()).toHaveAttribute('contenteditable', 'false')
+  })
+
+  it('opens a note the app asked to focus (a new note) in edit mode', async () => {
+    const { requestEditorFocus } = await import('../hooks/useEditorFocus')
+    requestEditorFocus({ path: mockEntry.path, selectTitle: true })
+    renderEditor({ tabs: [mockTab], activeTabPath: mockEntry.path })
+
+    expect(screen.getByTestId('blocknote-editable')).toHaveAttribute('contenteditable', 'true')
+    expect(screen.getByRole('button', { name: 'Switch to view mode' })).toBeInTheDocument()
+  })
+})
+
 describe('click empty editor space', () => {
   it('focuses editor at end of last block when clicking empty space below content', () => {
+    setNoteEditable(mockEntry.path, true)
     mockEditor.focus.mockClear()
     mockEditor.setTextCursorPosition.mockClear()
 
@@ -757,6 +788,7 @@ describe('click empty editor space', () => {
   })
 
   it('restores the cursor to the H1 when clicking the title block', async () => {
+    setNoteEditable(mockEntry.path, true)
     mockEditor.focus.mockClear()
     mockEditor.setTextCursorPosition.mockClear()
     mockEditor.document = [

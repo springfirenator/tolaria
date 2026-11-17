@@ -3,6 +3,7 @@ import type { ComponentProps, PropsWithChildren, ReactElement } from 'react'
 import { expect, it, vi } from 'vitest'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { clearParsedNoteBlockCache } from '../hooks/editorParsedBlockCache'
+import { resetNoteEditModesForTests } from '../hooks/useNoteEditMode'
 import type { VaultEntry } from '../types'
 
 Object.defineProperty(window, 'matchMedia', {
@@ -338,6 +339,7 @@ export function resetEditorTestState() {
   capturedSuggestionState.getItems = null
   capturedSuggestionState.getItemsByTrigger = {}
   clearParsedNoteBlockCache()
+  resetNoteEditModesForTests()
 }
 
 export { blockNoteCreation, blockNoteViewState, mockEditor }

@@ -50,6 +50,7 @@ import {
   ArrowsClockwise,
   ArrowsInLineHorizontal,
   ArrowsOutLineHorizontal,
+  PencilSimple,
 } from '@phosphor-icons/react'
 import { slugify } from '../hooks/useNoteCreation'
 import { useDragRegion } from '../hooks/useDragRegion'
@@ -89,6 +90,10 @@ interface BreadcrumbBarProps {
   onRenameFilename?: (path: string, newFilenameStem: string) => void
   noteWidth?: NoteWidthMode
   onToggleNoteWidth?: () => void
+  /** True while the note is editable; notes open read-only (view mode). */
+  editMode?: boolean
+  /** Omitted when the note cannot switch modes (sheet, HTML preview, read-only access). */
+  onToggleEditMode?: () => void
   /** Ref for direct DOM manipulation — avoids re-render on scroll. */
   barRef?: React.Ref<HTMLDivElement>
   locale?: AppLocale
@@ -377,6 +382,21 @@ function NoteWidthAction({
       {isWide
         ? <ArrowsInLineHorizontal size={16} className={BREADCRUMB_ICON_CLASS} />
         : <ArrowsOutLineHorizontal size={16} className={BREADCRUMB_ICON_CLASS} />}
+    </IconActionButton>
+  )
+}
+
+function EditModeAction({ editMode = false, locale = 'en', onToggleEditMode }: { editMode?: boolean; locale?: AppLocale; onToggleEditMode?: () => void }) {
+  if (!onToggleEditMode) return null
+
+  return (
+    <IconActionButton
+      copy={{ label: translate(locale, editMode ? 'editor.toolbar.switchToViewMode' : 'editor.toolbar.switchToEditMode') }}
+      onClick={onToggleEditMode}
+      className={cn(editMode ? 'text-foreground' : 'hover:text-foreground')}
+      testId="breadcrumb-edit-mode-toggle"
+    >
+      <PencilSimple size={16} weight={editMode ? 'fill' : 'regular'} className={BREADCRUMB_ICON_CLASS} />
     </IconActionButton>
   )
 }
@@ -925,6 +945,8 @@ function BreadcrumbActions(options: Omit<BreadcrumbBarProps, 'wordCount' | 'barR
     forceRawMode,
     noteWidth,
     onToggleNoteWidth,
+    editMode,
+    onToggleEditMode,
     showTableOfContents,
     onToggleTableOfContents,
     inspectorCollapsed,
@@ -956,6 +978,7 @@ function BreadcrumbActions(options: Omit<BreadcrumbBarProps, 'wordCount' | 'barR
       style={{ gap: 8 }}
     >
       <NotePresence locale={locale} />
+      <EditModeAction editMode={editMode} locale={locale} onToggleEditMode={onToggleEditMode} />
       <FavoriteAction favorite={entry.favorite} locale={locale} onToggleFavorite={favoriteAction} />
       <OrganizedAction organized={entry.organized} locale={locale} onToggleOrganized={organizedAction} />
       <OverflowToolbarAction>

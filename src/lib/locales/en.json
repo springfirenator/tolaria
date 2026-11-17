@@ -776,6 +776,8 @@
   "editor.toolbar.rawOpen": "Open the raw editor",
   "editor.toolbar.noteWidthNormal": "Switch to normal note width",
   "editor.toolbar.noteWidthWide": "Switch to wide note width",
+  "editor.toolbar.switchToEditMode": "Switch to edit mode",
+  "editor.toolbar.switchToViewMode": "Switch to view mode",
   "editor.toolbar.centerLayout": "Switch to centered note layout",
   "editor.toolbar.leftLayout": "Switch to left-aligned note layout",
   "editor.toolbar.removeFavorite": "Remove from favorites",

@@ -59,6 +59,9 @@ describe("App.navigation", () => {
 			{},
 			{ timeout: SLOW_APP_READY_TIMEOUT_MS },
 		);
+		// Notes open read-only; only an editable editor is an Escape blur target.
+		fireEvent.click(screen.getByRole("button", { name: "Switch to edit mode" }));
+		await waitFor(() => expect(editor).toHaveAttribute("contenteditable", "true"));
 		editor.focus();
 		expect(editor).toHaveFocus();
 

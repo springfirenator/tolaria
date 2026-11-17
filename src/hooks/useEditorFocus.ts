@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { focusEditorWithRetries, type FocusableEditor } from './editorFocusUtils'
 import { resumeEditorFocus } from './editorFocusOwnership'
+import { setNoteEditable } from './useNoteEditMode'
 
 const TAB_SWAP_EVENT_NAME = 'laputa:editor-tab-swapped'
 const FOCUS_EVENT_NAME = 'laputa:focus-editor'
@@ -51,6 +52,8 @@ function releaseTriggerControlFocus(): void {
 }
 
 export function requestEditorFocus(detail: FocusEventDetail): void {
+  // Asking the editor for focus means the user is about to type into this note.
+  if (detail.path) setNoteEditable(detail.path, true)
   if (detail.path && detail.selectTitle) releaseTriggerControlFocus()
   rememberPendingFocusRequest(detail)
   window.setTimeout(() => {

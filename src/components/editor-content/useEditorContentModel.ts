@@ -9,6 +9,7 @@ import type { BlockNoteRenderRecoveryReason } from '../blockNoteRenderRecovery'
 import { deriveEditorContentState } from './editorContentState'
 import { useOfflineReadOnly } from '../../hooks/useOfflineReadOnly'
 import { useSharedReadOnly } from '../../hooks/useVaultAccess'
+import { useNoteEditMode } from '../../hooks/useNoteEditMode'
 import type { RawEditorFindRequest } from '../RawEditorFindBar'
 import type { ImageImportError } from '../../hooks/useImageDrop'
 
@@ -113,6 +114,9 @@ export function useEditorContentModel(props: EditorContentProps) {
   const breadcrumbBarRef = useRef<HTMLDivElement | null>(null)
   const offlineReadOnly = useOfflineReadOnly()
   const sharedReadOnly = useSharedReadOnly(path ?? null)
+  const accessReadOnly = offlineReadOnly || sharedReadOnly
+  const { editing, toggleEditing } = useNoteEditMode(path ?? null)
+  const canToggleEditMode = !!activeTab && !accessReadOnly && !isDeletedPreview && !isHtmlPreview && !isSheet
 
   return {
     ...props,
@@ -129,6 +133,8 @@ export function useEditorContentModel(props: EditorContentProps) {
     path,
     breadcrumbBarRef,
     wordCount,
-    readOnly: offlineReadOnly || sharedReadOnly,
+    readOnly: accessReadOnly || !editing,
+    editMode: editing,
+    onToggleEditMode: canToggleEditMode ? toggleEditing : undefined,
   }
 }
